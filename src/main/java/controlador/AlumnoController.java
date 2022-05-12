@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,17 +102,17 @@ public class AlumnoController extends HttpServlet {
 		int id = 0;
 		try {
 			id = Integer.parseInt( request.getParameter("id"));
-			
 		} catch (NumberFormatException e) {
 			System.err.println("id se setea a 0 de manera automatica. ");
 		}
 		
 		String nombre = request.getParameter("nombre");
 		String carrera = request.getParameter("carrera");
+		LocalDate fechaNacimiento = LocalDate.parse(request.getParameter("nacimiento"));
 		
 		if(id == 0) {
 			//crear el alumno
-			Alumno alumnoNuevo = new Alumno(nombre, carrera);
+			Alumno alumnoNuevo = new Alumno(nombre, carrera, fechaNacimiento);
 			try {
 				crearAlumno(alumnoNuevo);
 				response.sendRedirect("/cft-web/AlumnoController?accion=listar");
@@ -122,7 +123,7 @@ public class AlumnoController extends HttpServlet {
 			
 		}else {
 			//editar
-			Alumno alumnoEditar = new Alumno(id, nombre, carrera);
+			Alumno alumnoEditar = new Alumno(id, nombre, carrera, fechaNacimiento);
 			try {
 				editarAlumno(alumnoEditar);
 				response.sendRedirect("/cft-web/AlumnoController?accion=listar");
@@ -153,8 +154,9 @@ public class AlumnoController extends HttpServlet {
 				int id = rs.getInt("id");
 				String nombre = rs.getString("nombre");
 				String  carrera = rs.getString("carrera");
+				LocalDate fechaNacimiento = rs.getObject("fecha_nacimiento", LocalDate.class);
 				//instanciar
-				Alumno alumno = new Alumno(id, nombre, carrera);
+				Alumno alumno = new Alumno(id, nombre, carrera, fechaNacimiento);
 				//agregar a la lista
 				alumnos.add(alumno);
 			}
@@ -164,13 +166,15 @@ public class AlumnoController extends HttpServlet {
 	
 	
 	public void crearAlumno(Alumno alumno) throws SQLException, NamingException{
+		String sql = "INSERT INTO alumnos(nombre, carrera, fecha_nacimiento) VALUES(?, ?, ?)";
 		try (
 			Connection conexion = getConexion();
 			//declaracion preparadas para evitar inyecciones de codigo sql(SEGFURIDAD)
-			PreparedStatement declaracion = conexion.prepareStatement("INSERT INTO alumnos(nombre, carrera) VALUES(?,?)");
+			PreparedStatement declaracion = conexion.prepareStatement(sql);
 		){
 			declaracion.setString(1, alumno.getNombre());
 			declaracion.setString(2, alumno.getCarrera());
+			declaracion.setObject(3, alumno.getFechaNacimiento());
 			int filasInsertadas = declaracion.executeUpdate();
 		}
 	}
@@ -187,7 +191,8 @@ public class AlumnoController extends HttpServlet {
 					int id = rs.getInt("id");
 					String nombre = rs.getString("nombre");
 					String carrera = rs.getString("carrera");
-					return new Alumno(id, nombre, carrera);
+					LocalDate fechaNacimiento = rs.getObject("fecha_nacimiento", LocalDate.class);
+					return new Alumno(id, nombre, carrera, fechaNacimiento);
 				} else {
 					return null;
 				}
@@ -207,14 +212,16 @@ public class AlumnoController extends HttpServlet {
 	
 	
 	public void editarAlumno(Alumno alumno) throws SQLException, NamingException {
+		String sql = "UPDATE alumnos SET nombre = ?, carrera = ?, fecha_nacimiento = ? WHERE id = ?";
 		try (
 				Connection conexion = getConexion();
 				//declaracion preparadas para evitar inyecciones de codigo sql(SEGFURIDAD)
-				PreparedStatement declaracion = conexion.prepareStatement("UPDATE alumnos SET nombre = ?, carrera = ? WHERE id = ?");
+				PreparedStatement declaracion = conexion.prepareStatement(sql);
 				){
 				declaracion.setString(1, alumno.getNombre());
 				declaracion.setString(2, alumno.getCarrera());
-				declaracion.setInt(3, alumno.getId());
+				declaracion.setObject(3, alumno.getFechaNacimiento());
+				declaracion.setInt(4, alumno.getId());
 				declaracion.executeUpdate();
 			}
 	}

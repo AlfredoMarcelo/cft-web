@@ -21,4 +21,14 @@
     <servlet-name>AlumnoController</servlet-name>
     <url-pattern>/AlumnoController</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>CarreraController</display-name>
+    <servlet-name>CarreraController</servlet-name>
+    <servlet-class>controlador.CarreraController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CarreraController</servlet-name>
+    <url-pattern>/CarreraController</url-pattern>
+  </servlet-mapping>
 </web-app>

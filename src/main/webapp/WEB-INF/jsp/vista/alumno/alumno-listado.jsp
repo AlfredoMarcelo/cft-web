@@ -17,6 +17,7 @@
 					<th>ID</th>
 					<th>Nombre</th>
 					<th>Carrera</th>
+					<th>Fecha nacimiento</th>
 					<th>Acciones</th>
 				</tr>
 			</thead>
@@ -26,6 +27,7 @@
 						<td><c:out value="${alumno.id}"></c:out></td>
 						<td><c:out value="${alumno.nombre}"></c:out></td>
 						<td><c:out value="${alumno.carrera}"></c:out></td>
+						<td><c:out value="${alumno.fechaNacimiento}"></c:out></td>
 						<td>
 							<a href="${pageContext.request.contextPath}/AlumnoController?accion=editar&amp;id=${alumno.id}">Editar</a>
 							<a href="${pageContext.request.contextPath}/AlumnoController?accion=eliminar&amp;id=${alumno.id}">Eliminar</a>
@@ -34,6 +36,7 @@
 				</c:forEach>
 			</tbody>
 		</table>
+			<a class="btn btn-danger" href="/cft-web/Index.jsp">Volver al menu</a>
 		</div>
 	</body>
 </html>
